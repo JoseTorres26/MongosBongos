@@ -1,5 +1,5 @@
 const connection = require('../config/connection');
-const { User, Thought } = require('../models');
+const { User, Thought, Reaction } = require('../models');
 
 connection.on('error', (err) => err);
 
@@ -9,6 +9,7 @@ connection.once('open', async () => {
   try {
     await User.deleteMany({});
     await Thought.deleteMany({});
+    await Reaction.deleteMany({});
 
     const user1 = await User.create({
       username: 'DRpibb',
@@ -30,10 +31,26 @@ connection.once('open', async () => {
       username: user2.username,
     });
 
+    const reaction1 = await Reaction.create({
+      reactionBody: 'no way!',
+      username: 'DRpibb',
+      createdAt: new Date(),
+    });
+
+    const reaction2 = await Reaction.create({
+      reactionBody: 'my mind is blown',
+      username: 'billymanhandel22',
+      createdAt: new Date(),
+    });
+
+    thought2.reactions.push(reaction1);
+    thought1.reactions.push(reaction2);
+
     user1.thoughts.push(thought1);
     user2.thoughts.push(thought2);
 
-    
+    await thought2.save();
+    await thought1.save();
     await user1.save();
     await user2.save();
 
@@ -44,5 +61,4 @@ connection.once('open', async () => {
     process.exit(1);
   }
 });
-   
 
